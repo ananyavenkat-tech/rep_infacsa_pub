@@ -1,8 +1,0 @@
-output/
-tmp/
-out/
-input/*.pbix
-__pycache__/
-*.pyc
-create_sample_pbix.py
-PowerBI_v3_package.zip
