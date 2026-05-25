@@ -1,7 +1,5 @@
 """
 Script Name: powerbi_v3.py
-Last Updated: 2025-05-21
-Contact: mlagrange@informatica.com
 Description: 
     This script converts powerbi on-prem pbix file into Informatica CDGC custom scanner payload for lineage 
 Safe Harbor: 
@@ -15,6 +13,24 @@ Note:
     - set DEBUG=True if you want to debug (output contains csv files, tmp/Report contains the payload)
     - set STATS=False if you don't want to share usage statistics 
 """
+# =============================================================================
+# BUSINESS CONTEXT
+# -----------------------------------------------------------------------------
+# Converts Power BI .pbix files into an Informatica CDGC custom scanner
+# metadata import package (ZIP of CSVs) for lineage and cataloging.
+#
+# Flow:
+#   1. Reads .pbix files from ./input/ (each is a ZIP containing Report/Layout)
+#   2. Parses the report hierarchy: Report → Sections → Visuals → Fields
+#   3. Resolves each visual field back to its source Table.Column via DAX
+#      expression parsing (handles Columns, Measures, and Aggregations)
+#   4. Writes 9 CDGC-compatible CSVs:
+#        Custom model : Report, Section, Visual, Dataset, Field
+#        Core CDGC    : core.Resource, core.DataSource, core.DataSet,
+#                       core.DataElement, links.csv
+#   5. Packages output into ./output/powerbi.zip ready for upload to
+#      Informatica CDGC via Metadata Command Center → Custom Scanner Import
+# =============================================================================
 #-- edit parameters [True|False] for debugging and statistics collection
 DEBUG=False
 STATS=True
