@@ -1,0 +1,3 @@
+core.externalId,core.Reference,core.assignable,core.name
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor,,TRUE,gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor
+gethaortagsraw/socar_lakehouse/gethaortagsraw.atomic_replace_table_as_select.lh_dwst_stg_tag_values_haor,,TRUE,gethaortagsraw.atomic_replace_table_as_select.lh_dwst_stg_tag_values_haor

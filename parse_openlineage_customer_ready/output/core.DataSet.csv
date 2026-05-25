@@ -1,0 +1,4 @@
+core.externalId,core.Reference,core.assignable,core.name
+s3___lakehouse.lh_dwst_stg/tag_values_haor,TRUE,,tag_values_haor
+s3___lh_downstream.stg/tag_values_haor,TRUE,,tag_values_haor
+s3a___ret_30./lh_dwst_stg/unp_haor_jsons,TRUE,,unp_haor_jsons
