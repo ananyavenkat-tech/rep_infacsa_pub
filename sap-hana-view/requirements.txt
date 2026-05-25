@@ -1,0 +1,13 @@
+# This script relies entirely on Python's built-in standard library.
+# No external pip packages are required to run this code!
+# 
+# The following standard modules are used:
+# - csv
+# - glob
+# - io
+# - json
+# - os
+# - pathlib
+# - sys
+# - xml.etree.ElementTree
+# - zipfile

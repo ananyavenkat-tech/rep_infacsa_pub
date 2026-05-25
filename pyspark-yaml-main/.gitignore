@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Local IDE and OS files
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Runtime output
+output/*.csv
+output/*.zip
+package/*.zip
+errors.csv
+
+# Local secrets/config
+.env
+.env.*

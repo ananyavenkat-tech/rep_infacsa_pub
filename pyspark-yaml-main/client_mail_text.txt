@@ -1,0 +1,61 @@
+Subject: CDGC Custom SQL Parser Scanner - Project Package
+
+Hi Team,
+
+Please find attached the CDGC Custom SQL Parser Scanner project package.
+
+This package contains a Python-based custom scanner implementation that parses SQL scripts and generates Informatica CDGC Custom Metadata Integration CSV files. It also creates a ready-to-upload CDGC package named CustomLineage.zip.
+
+What is included:
+- custom.sqlparser.json: Custom model definition for SQLParser, SQLScript, and SQLScriptColumn assets.
+- parse_sql_script_repo.py: Main execution script.
+- parse_column_lineage.py: SQL parsing, asset mapping, and lineage generation logic.
+- parser_utils.py: Common CSV, metadata, logging, and zip helper functions.
+- requirements.txt: Python dependencies.
+- README.md: Complete setup, execution, model, lineage, and ingestion documentation.
+- input/: Sample SQL files.
+- output/: Generated CSV files.
+- package/CustomLineage.zip: Ready-to-upload CDGC Custom Metadata Integration package.
+
+Implementation summary:
+- SQL files are parsed using the sqllineage library.
+- Reference assets are generated as core.Resource, core.DataSource, core.DataSet, and core.DataElement CSVs.
+- SQL transformation assets are generated using the custom.sqlparser model:
+  - custom.sqlparser.SQLParser for each SQL file
+  - custom.sqlparser.SQLScript for each parsed SQL statement
+  - custom.sqlparser.SQLScriptColumn for calculated/output columns
+- Dataset-level lineage is represented with core.DataSetDataFlow.
+- Column-level lineage is represented with core.DirectionalDataFlow.
+- Parent-child associations are generated in links.csv.
+
+Execution command:
+
+python parse_sql_script_repo.py -i input -o output
+
+This command creates:
+- output/*.csv
+- package/CustomLineage.zip
+
+Supported SQL dialects include:
+ansi, athena, bigquery, clickhouse, databricks, db2, doris, duckdb, exasol, flink, greenplum, hive, impala, mariadb, materialize, mysql, oracle, postgres, redshift, snowflake, soql, sparksql, sqlite, starrocks, teradata, trino, tsql, vertica, and non-validating.
+
+Validation status:
+- SQL statements parsed: 4/4
+- Unparsed SQL statements: 0
+- Data sets generated: 8
+- Data elements generated: 141
+- SQL scripts generated: 4
+- SQL script columns generated: 71
+- Links generated: 384
+- Missing linked IDs: 0
+- CSV row-width issues: 0
+
+CDGC ingestion steps:
+1. Register or deploy custom.sqlparser.json in CDGC.
+2. Create or open the Custom Metadata Integration catalog source.
+3. Upload package/CustomLineage.zip.
+4. Run extraction.
+5. Validate dataset-level lineage and column-level lineage in CDGC.
+
+Regards,
+Rashmi

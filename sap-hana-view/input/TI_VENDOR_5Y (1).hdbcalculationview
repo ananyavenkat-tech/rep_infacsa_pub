@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="TI_VENDOR_5Y" applyPrivilegeType="ANALYTIC_PRIVILEGE" cacheEnabled="true" cacheInvalidationPeriod="DAILY" checkAnalyticPrivileges="true" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" translationRelevant="true" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" runWithInvokerPrivileges="true" scriptParametersCaseSensitive="true">
+  <origin/>
+  <descriptions defaultDescription="TIME_INTELLIGENCE_VENDOR_5Y"/>
+  <metadata changedAt="2026-02-03 14:57:30.023"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources/>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute datatype="NVARCHAR" id="RBUKRS" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="RBUSA" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="RYEAR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="DOCNR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="RACCT" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="POPER" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="BUDAT" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="LIFNR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="KUNNR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="RTCUR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="RWCUR" length="20"/>
+        <viewAttribute datatype="DECIMAL" id="WSL" length="23" scale="2"/>
+        <viewAttribute datatype="DECIMAL" id="TSL" length="23" scale="2"/>
+        <viewAttribute datatype="DECIMAL" id="HSL" length="23" scale="2"/>
+        <viewAttribute datatype="NVARCHAR" id="ZUONR" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="PAYMENT_ORDER" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="SGTXT" length="500"/>
+        <viewAttribute datatype="NVARCHAR" id="DAY" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="WEEKDAY" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="DAYNAME" length="20"/>
+        <viewAttribute datatype="NVARCHAR" id="SIXDAYGROUP" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="WEEKOFMONTH" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="CUSTOMER_NAME" length="1000"/>
+        <viewAttribute datatype="NVARCHAR" id="VENDOR_NAME" length="1000"/>
+        <viewAttribute datatype="NVARCHAR" id="TRANSACTION_TYPE" length="20"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <definition> 
+ /********* Begin Procedure Script ************/ 
+ BEGIN 
+ 	 var_out = 
+ WITH BS AS (
+SELECT 
+    BELNR,                     
+    BUKRS,                    
+    GJAHR,                
+    MAX(CASE WHEN BUZEI  LIKE '%1' THEN ZUONR END) AS ZUONR,  
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN LIFNR END) AS LIFNR  ,
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN KUNNR END) AS KUNNR,
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN SGTXT END) AS SGTXT
+FROM &quot;SLT_PRD_BAP&quot;.&quot;BSEG&quot;
+WHERE  GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+ --GJAHR = 2022                      
+GROUP BY BELNR, BUKRS, GJAHR    ),
+cte2 AS (SELECT DISTINCT
+RBUKRS, RBUSA, RYEAR,  DOCNR, RACCT, POPER, f.BUDAT, BS.LIFNR, BS.KUNNR,
+RTCUR, RWCUR, WSL, TSL, HSL, BS.ZUONR, febcl.selvon as payment_order,
+ BS.SGTXT, EXTRACT_DAY(f.BUDAT) AS &quot;DAY&quot;,  
+WEEKDAY(f.BUDAT) AS &quot;WEEKDAY&quot;, DAYNAME (f.BUDAT) AS &quot;DAYNAME&quot;, 
+CEIL(DAYOFMONTH(f.BUDAT) / 6.0) AS SixDayGroup,     
+CEIL((DAYOFMONTH(f.BUDAT) + WEEKDAY(TO_DATE(YEAR(f.BUDAT) || '-' || MONTH(f.BUDAT) || '-01', 'YYYY-MM-DD'))) / 7.0) AS WeekOfMonth,
+DC.FULLNAME AS Customer_Name, DV.FULLNAME AS Vendor_Name
+FROM &quot;SLT_PRD_BAP&quot;.&quot;FAGLFLEXA&quot; AS F
+INNER JOIN BS
+ON F.RYEAR = BS.GJAHR AND F.DOCNR = BS.BELNR AND F.RBUKRS = BS.BUKRS 
+INNER JOIN &quot;SLT_PRD_BAP&quot;.&quot;T012K&quot; AS T
+ ON  T.hkont = F.RACCT
+ INNER JOIN &quot;SLT_PRD_BAP&quot;.&quot;BSEG&quot; AS BSEG
+ON F.RYEAR = BSEG.GJAHR AND F.DOCNR = BSEG.BELNR AND F.RBUKRS = BSEG.BUKRS AND BSEG.BUZEI LIKE '%1' and  BSEG.GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+LEFT JOIN &quot;SLT_PRD_BAP&quot;.&quot;BKPF&quot; AS BKPF ON BKPF.BELNR = BSEG.BELNR AND BKPF.BUKRS = BSEG.BUKRS AND BKPF.GJAHR = BSEG.GJAHR AND BKPF.GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+LEFT JOIN &quot;SLT_PRD_BAP&quot;.&quot;FEBCL&quot; AS FEBCL ON left(&quot;BKPF&quot;.&quot;BKTXT&quot;, 8) = febcl.kukey and RIGHT(BKPF.&quot;BKTXT&quot;, 5) = FEBCL.ESNUM
+LEFT JOIN &quot;_SYS_BIC&quot;.&quot;sc-dm-dev.Time_Intelligence/DIM_VEND&quot; AS DV ON BS.LIFNR = DV.LIFNR
+LEFT JOIN &quot;_SYS_BIC&quot;.&quot;sc-dm-dev.Time_Intelligence/DIM_CUST&quot; AS DC ON BS.KUNNR = DC.KUNNR
+WHERE RYEAR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5) ),
+cte3 AS(SELECT 
+      RBUKRS, RBUSA, RYEAR,  DOCNR, RACCT, POPER, BUDAT, LIFNR, KUNNR,
+      RTCUR, RWCUR, WSL, TSL, HSL, ZUONR, payment_order, SGTXT, &quot;DAY&quot;, 
+      &quot;WEEKDAY&quot;, &quot;DAYNAME&quot;, SixDayGroup, WeekOfMonth, Customer_Name, Vendor_Name,
+      CASE
+	    WHEN nullif(trim(payment_order), '') IS NOT NULL AND nullif(trim(LIFNR), '') IS NOT NULL AND NULLIF(trim(KUNNR), '') IS NULL 
+	    AND HSL > 0 AND TSL > 0 AND WSL > 0 THEN 'refund'
+	    WHEN nullif(trim(payment_order), '') IS NOT NULL AND nullif(trim(LIFNR), '') IS NOT NULL AND NULLIF(trim(KUNNR), '') IS NULL THEN 'payment'
+	    WHEN nullif(trim(payment_order), '') IS NULL AND nullif(trim(LIFNR), '') IS NULL AND NULLIF(trim(KUNNR), '') IS NOT NULL THEN 'receipt'
+	    WHEN nullif(trim(payment_order), '') IS NULL AND nullif(trim(LIFNR), '') IS NULL AND NULLIF(trim(KUNNR), '') IS NULL THEN 'other'
+	    ELSE 'unknown'
+	  END AS transaction_type
+FROM cte2)
+SELECT * FROM cte3;
+ 
+ 	 
+
+END /********* End Procedure Script ************/</definition>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Script_View">
+    <descriptions/>
+    <attributes>
+      <attribute id="RBUKRS" order="1">
+        <descriptions defaultDescription="RBUKRS"/>
+        <keyMapping columnObjectName="Script_View" columnName="RBUKRS"/>
+      </attribute>
+      <attribute id="RBUSA" order="2">
+        <descriptions defaultDescription="RBUSA"/>
+        <keyMapping columnObjectName="Script_View" columnName="RBUSA"/>
+      </attribute>
+      <attribute id="RYEAR" order="3">
+        <descriptions defaultDescription="RYEAR"/>
+        <keyMapping columnObjectName="Script_View" columnName="RYEAR"/>
+      </attribute>
+      <attribute id="DOCNR" order="4">
+        <descriptions defaultDescription="DOCNR"/>
+        <keyMapping columnObjectName="Script_View" columnName="DOCNR"/>
+      </attribute>
+      <attribute id="RACCT" order="5">
+        <descriptions defaultDescription="RACCT"/>
+        <keyMapping columnObjectName="Script_View" columnName="RACCT"/>
+      </attribute>
+      <attribute id="POPER" order="6">
+        <descriptions defaultDescription="POPER"/>
+        <keyMapping columnObjectName="Script_View" columnName="POPER"/>
+      </attribute>
+      <attribute id="BUDAT" order="7">
+        <descriptions defaultDescription="BUDAT"/>
+        <keyMapping columnObjectName="Script_View" columnName="BUDAT"/>
+      </attribute>
+      <attribute id="LIFNR" order="8">
+        <descriptions defaultDescription="LIFNR"/>
+        <keyMapping columnObjectName="Script_View" columnName="LIFNR"/>
+      </attribute>
+      <attribute id="KUNNR" order="9">
+        <descriptions defaultDescription="KUNNR"/>
+        <keyMapping columnObjectName="Script_View" columnName="KUNNR"/>
+      </attribute>
+      <attribute id="RTCUR" order="10">
+        <descriptions defaultDescription="RTCUR"/>
+        <keyMapping columnObjectName="Script_View" columnName="RTCUR"/>
+      </attribute>
+      <attribute id="RWCUR" order="11">
+        <descriptions defaultDescription="RWCUR"/>
+        <keyMapping columnObjectName="Script_View" columnName="RWCUR"/>
+      </attribute>
+      <attribute id="ZUONR" order="15">
+        <descriptions defaultDescription="ZUONR"/>
+        <keyMapping columnObjectName="Script_View" columnName="ZUONR"/>
+      </attribute>
+      <attribute id="PAYMENT_ORDER" order="16">
+        <descriptions defaultDescription="PAYMENT_ORDER"/>
+        <keyMapping columnObjectName="Script_View" columnName="PAYMENT_ORDER"/>
+      </attribute>
+      <attribute id="SGTXT" order="17">
+        <descriptions defaultDescription="SGTXT"/>
+        <keyMapping columnObjectName="Script_View" columnName="SGTXT"/>
+      </attribute>
+      <attribute id="DAY" order="18">
+        <descriptions defaultDescription="DAY"/>
+        <keyMapping columnObjectName="Script_View" columnName="DAY"/>
+      </attribute>
+      <attribute id="WEEKDAY" order="19">
+        <descriptions defaultDescription="WEEKDAY"/>
+        <keyMapping columnObjectName="Script_View" columnName="WEEKDAY"/>
+      </attribute>
+      <attribute id="DAYNAME" order="20">
+        <descriptions defaultDescription="DAYNAME"/>
+        <keyMapping columnObjectName="Script_View" columnName="DAYNAME"/>
+      </attribute>
+      <attribute id="SIXDAYGROUP" order="21">
+        <descriptions defaultDescription="SIXDAYGROUP"/>
+        <keyMapping columnObjectName="Script_View" columnName="SIXDAYGROUP"/>
+      </attribute>
+      <attribute id="WEEKOFMONTH" order="22">
+        <descriptions defaultDescription="WEEKOFMONTH"/>
+        <keyMapping columnObjectName="Script_View" columnName="WEEKOFMONTH"/>
+      </attribute>
+      <attribute id="CUSTOMER_NAME" order="23">
+        <descriptions defaultDescription="CUSTOMER_NAME"/>
+        <keyMapping columnObjectName="Script_View" columnName="CUSTOMER_NAME"/>
+      </attribute>
+      <attribute id="VENDOR_NAME" order="24">
+        <descriptions defaultDescription="VENDOR_NAME"/>
+        <keyMapping columnObjectName="Script_View" columnName="VENDOR_NAME"/>
+      </attribute>
+      <attribute id="TRANSACTION_TYPE" order="25">
+        <descriptions defaultDescription="TRANSACTION_TYPE"/>
+        <keyMapping columnObjectName="Script_View" columnName="TRANSACTION_TYPE"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures>
+      <measure id="WSL" order="12" aggregationType="sum" measureType="simple">
+        <descriptions defaultDescription="WSL"/>
+        <measureMapping columnObjectName="Script_View" columnName="WSL"/>
+      </measure>
+      <measure id="TSL" order="13" aggregationType="sum" measureType="simple">
+        <descriptions defaultDescription="TSL"/>
+        <measureMapping columnObjectName="Script_View" columnName="TSL"/>
+      </measure>
+      <measure id="HSL" order="14" aggregationType="sum" measureType="simple">
+        <descriptions defaultDescription="HSL"/>
+        <measureMapping columnObjectName="Script_View" columnName="HSL"/>
+      </measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="40" y="85"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

@@ -1,0 +1,2 @@
+"core.externalId","core.name","core.description","custom.sap.hana.calcscript.v3.scriptType","custom.sap.hana.calcscript.v3.transformationLogic","custom.sap.hana.calcscript.v3.joinType","custom.sap.hana.calcscript.v3.filterCondition","custom.sap.hana.calcscript.v3.complexityScore","custom.sap.hana.calcscript.v3.sourceTableCount","custom.sap.hana.calcscript.v3.sourceSchema"
+"HanaCalcView::TI_VENDOR_5Y/Script_View","Script_View","SCRIPT_BASED node in TI_VENDOR_5Y","SCRIPT_BASED","","","","0","0",""
