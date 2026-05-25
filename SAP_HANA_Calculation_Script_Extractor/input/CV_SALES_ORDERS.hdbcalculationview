@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="CV_SALES_ORDERS" applyPrivilegeType="ANALYTIC_PRIVILEGE" cacheEnabled="true" cacheInvalidationPeriod="DAILY" checkAnalyticPrivileges="true" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" translationRelevant="true" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" runWithInvokerPrivileges="true" scriptParametersCaseSensitive="true">
+  <origin/>
+  <descriptions defaultDescription="Sales Order Summary"/>
+  <metadata changedAt="2026-03-01 08:00:00.000"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources/>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute datatype="NVARCHAR" id="VBELN" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="ERDAT" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="AUART" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="KUNNR" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="CUSTOMER_NAME" length="100"/>
+        <viewAttribute datatype="NVARCHAR" id="MATNR" length="18"/>
+        <viewAttribute datatype="NVARCHAR" id="ARKTX" length="40"/>
+        <viewAttribute datatype="NVARCHAR" id="WAERK" length="5"/>
+        <viewAttribute datatype="NVARCHAR" id="VKORG" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="ORDER_STATUS" length="20"/>
+        <viewAttribute datatype="DECIMAL" id="KWMENG" length="23" scale="3"/>
+        <viewAttribute datatype="DECIMAL" id="NETWR" length="23" scale="2"/>
+        <viewAttribute datatype="DECIMAL" id="MWSBP" length="23" scale="2"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <definition>
+/********* Begin Procedure Script ************/
+BEGIN
+  var_out =
+  WITH order_header AS (
+    SELECT
+      VBAK.VBELN,
+      VBAK.ERDAT,
+      VBAK.AUART,
+      VBAK.KUNNR,
+      VBAK.WAERK,
+      VBAK.VKORG,
+      VBAK.GBSTK
+    FROM &quot;SLT_PRD_SD&quot;.&quot;VBAK&quot; AS VBAK
+    WHERE VBAK.ERDAT >= ADD_YEARS(CURRENT_DATE, -2)
+  ),
+  order_items AS (
+    SELECT
+      oh.VBELN,
+      oh.ERDAT,
+      oh.AUART,
+      oh.KUNNR,
+      oh.WAERK,
+      oh.VKORG,
+      oh.GBSTK,
+      VBAP.MATNR,
+      VBAP.ARKTX,
+      VBAP.KWMENG,
+      VBAP.NETWR,
+      VBAP.MWSBP
+    FROM order_header AS oh
+    INNER JOIN &quot;SLT_PRD_SD&quot;.&quot;VBAP&quot; AS VBAP ON oh.VBELN = VBAP.VBELN
+  ),
+  enriched AS (
+    SELECT
+      oi.VBELN,
+      oi.ERDAT,
+      oi.AUART,
+      oi.KUNNR,
+      KNA1.NAME1 AS CUSTOMER_NAME,
+      oi.MATNR,
+      oi.ARKTX,
+      oi.WAERK,
+      oi.VKORG,
+      oi.KWMENG,
+      oi.NETWR,
+      oi.MWSBP,
+      CASE oi.GBSTK
+        WHEN 'A' THEN 'Open'
+        WHEN 'B' THEN 'Partially Processed'
+        WHEN 'C' THEN 'Completed'
+        ELSE 'Unknown'
+      END AS ORDER_STATUS
+    FROM order_items AS oi
+    LEFT JOIN &quot;SLT_PRD_SD&quot;.&quot;KNA1&quot; AS KNA1 ON oi.KUNNR = KNA1.KUNNR
+  )
+  SELECT * FROM enriched;
+END /********* End Procedure Script ************/
+      </definition>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Script_View">
+    <descriptions/>
+    <attributes>
+      <attribute id="VBELN" order="1"><descriptions defaultDescription="Sales Order"/><keyMapping columnObjectName="Script_View" columnName="VBELN"/></attribute>
+      <attribute id="ERDAT" order="2"><descriptions defaultDescription="Creation Date"/><keyMapping columnObjectName="Script_View" columnName="ERDAT"/></attribute>
+      <attribute id="AUART" order="3"><descriptions defaultDescription="Order Type"/><keyMapping columnObjectName="Script_View" columnName="AUART"/></attribute>
+      <attribute id="KUNNR" order="4"><descriptions defaultDescription="Customer Number"/><keyMapping columnObjectName="Script_View" columnName="KUNNR"/></attribute>
+      <attribute id="CUSTOMER_NAME" order="5"><descriptions defaultDescription="Customer Name"/><keyMapping columnObjectName="Script_View" columnName="CUSTOMER_NAME"/></attribute>
+      <attribute id="MATNR" order="6"><descriptions defaultDescription="Material Number"/><keyMapping columnObjectName="Script_View" columnName="MATNR"/></attribute>
+      <attribute id="ARKTX" order="7"><descriptions defaultDescription="Short Text"/><keyMapping columnObjectName="Script_View" columnName="ARKTX"/></attribute>
+      <attribute id="WAERK" order="8"><descriptions defaultDescription="Currency"/><keyMapping columnObjectName="Script_View" columnName="WAERK"/></attribute>
+      <attribute id="VKORG" order="9"><descriptions defaultDescription="Sales Organization"/><keyMapping columnObjectName="Script_View" columnName="VKORG"/></attribute>
+      <attribute id="ORDER_STATUS" order="10"><descriptions defaultDescription="Order Status"/><keyMapping columnObjectName="Script_View" columnName="ORDER_STATUS"/></attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation><tableProxies/><joins/><layout><shapes/></layout></privateDataFoundation>
+    <baseMeasures>
+      <measure id="KWMENG" order="11" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Order Quantity"/><measureMapping columnObjectName="Script_View" columnName="KWMENG"/></measure>
+      <measure id="NETWR" order="12" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Net Value"/><measureMapping columnObjectName="Script_View" columnName="NETWR"/></measure>
+      <measure id="MWSBP" order="13" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Tax Amount"/><measureMapping columnObjectName="Script_View" columnName="MWSBP"/></measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout><shapes><shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup"><upperLeftCorner x="40" y="85"/></shape></shapes></layout>
+</Calculation:scenario>

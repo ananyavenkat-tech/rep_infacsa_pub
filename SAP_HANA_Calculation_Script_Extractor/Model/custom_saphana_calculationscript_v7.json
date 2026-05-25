@@ -1,0 +1,566 @@
+{
+  "packageName": "custom.sap.hana.calscript.v7",
+  "packageDescription": "Custom metadata model for SAP HANA Calculation View internal script architectures, designed to link directly with core reference data sources, datasets, and dataelements.",
+  "packageLabel": "SAP HANA Calculation Script V7",
+  "deprecated": false,
+  "subsystem": false,
+  "cdc": true,
+  "classes": [
+    {
+      "name": "HanaCalcView",
+      "label": "HANA Calculation View",
+      "description": "Represents a SAP HANA Calculation View. Extends core.DataSet so it natively participates in core object-level lineage.",
+      "isFirstClass": true,
+      "superClasses": [
+        "core.DataSet",
+        "core.IClass"
+      ],
+      "deprecated": false,
+      "isAbstract": false,
+      "cdc": true,
+      "indexType": "FULL",
+      "appendOnly": false,
+      "extensions": [],
+      "metrics": [],
+      "softDeleted": false,
+      "system": false,
+      "custom": true
+    },
+    {
+      "name": "HanaCalcViewField",
+      "label": "HANA Calculation View Field",
+      "description": "Represents an output column or attribute of a SAP HANA Calculation View. Extends core.DataElement for field-level lineage.",
+      "isFirstClass": true,
+      "superClasses": [
+        "core.DataElement",
+        "core.IClass"
+      ],
+      "deprecated": false,
+      "isAbstract": false,
+      "cdc": true,
+      "indexType": "FULL",
+      "appendOnly": false,
+      "extensions": [],
+      "metrics": [],
+      "softDeleted": false,
+      "system": false,
+      "custom": true
+    },
+    {
+      "name": "HanaScriptBlock",
+      "label": "HANA Script Block",
+      "description": "Represents the internal transformation node (Projection, Join, Union) within a SAP HANA Calculation View script.",
+      "isFirstClass": true,
+      "superClasses": [
+        "core.DataSet",
+        "core.IClass"
+      ],
+      "deprecated": false,
+      "isAbstract": false,
+      "cdc": true,
+      "indexType": "FULL",
+      "appendOnly": false,
+      "extensions": [],
+      "metrics": [],
+      "softDeleted": false,
+      "system": false,
+      "custom": true
+    }
+  ],
+  "requiredPackages": [
+    "core"
+  ],
+  "associations": [
+    {
+      "name": "HanaCalcViewToHanaCalcViewField",
+      "label": "HANA Calculation View to HANA Calculation View Field",
+      "fromClass": "custom.sap.hana.calscript.v7.HanaCalcView",
+      "toClass": "custom.sap.hana.calscript.v7.HanaCalcViewField",
+      "fromLabel": "HANA Calculation View",
+      "toLabel": "HANA Calculation View Field",
+      "associationKinds": [
+        "core.ParentChild",
+        "core.IAssociation"
+      ],
+      "deprecated": false,
+      "projections": false,
+      "cdc": true,
+      "unidirectional": false,
+      "aggregate": false,
+      "description": "A Calculation View contains one or more output fields.",
+      "customizable": false,
+      "custom": true,
+      "deleted": false
+    },
+    {
+      "name": "HanaCalcViewToHanaScriptBlock",
+      "label": "HANA Calculation View to HANA Script Block",
+      "fromClass": "custom.sap.hana.calscript.v7.HanaCalcView",
+      "toClass": "custom.sap.hana.calscript.v7.HanaScriptBlock",
+      "fromLabel": "HANA Calculation View",
+      "toLabel": "HANA Script Block",
+      "associationKinds": [
+        "core.ParentChild",
+        "core.IAssociation"
+      ],
+      "deprecated": false,
+      "projections": false,
+      "cdc": true,
+      "unidirectional": false,
+      "aggregate": false,
+      "description": "A Calculation View groups one or more internal script transformation blocks.",
+      "customizable": false,
+      "custom": true,
+      "deleted": false
+    }
+  ],
+  "attributes": [
+    {
+      "name": "packagePath",
+      "label": "Package Path",
+      "dataType": "core.String",
+      "description": "Full SAP HANA repository package path (e.g. sap.hana.finance::CV_SALES)",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "calcViewType",
+      "label": "Calculation View Type",
+      "dataType": "core.String",
+      "description": "Type of the calculation view: CALCULATION_VIEW, ATTRIBUTE_VIEW, or ANALYTIC_VIEW",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "defaultClient",
+      "label": "Default Client",
+      "dataType": "core.String",
+      "description": "SAP default client setting on the calculation view",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "VIEWABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "scriptType",
+      "label": "Script Type",
+      "dataType": "core.String",
+      "description": "Type of transformation node: PROJECTION, JOIN, UNION, AGGREGATION, RANK",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "transformationLogic",
+      "label": "Transformation Logic",
+      "dataType": "core.String",
+      "description": "Extracted SQL expressions or calculated formulas from the script node",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "VIEWABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "joinType",
+      "label": "Join Type",
+      "dataType": "core.String",
+      "description": "Type of join in this node: INNER, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "filterCondition",
+      "label": "Filter Condition",
+      "dataType": "core.String",
+      "description": "WHERE/filter condition applied in this script node",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "VIEWABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "keyAttribute",
+      "label": "Key Attribute",
+      "dataType": "core.String",
+      "description": "Indicates whether this field is a key attribute of the view (true/false)",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "columnExpression",
+      "label": "Column Expression",
+      "dataType": "core.String",
+      "description": "The computed expression for this output field",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "VIEWABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    },
+    {
+      "name": "columnDataType",
+      "label": "Column Data Type",
+      "dataType": "core.String",
+      "description": "SAP HANA data type of this output column",
+      "multivalued": false,
+      "deprecated": false,
+      "derived": false,
+      "data": false,
+      "defaultValues": [],
+      "isSystem": false,
+      "embedded": false,
+      "reference": "",
+      "referencedAttributes": [],
+      "searchConfiguration": {
+        "suggestable": false,
+        "aggregatable": false,
+        "sortable": false,
+        "attributeType": "SEARCHABLE"
+      },
+      "metric": false,
+      "projectionExpressions": [],
+      "deleted": false,
+      "custom": true,
+      "customizations": [
+        "NONE"
+      ]
+    }
+  ],
+  "classAttributes": [
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcView",
+      "attributeName": "custom.sap.hana.calscript.v7.packagePath",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcView",
+      "attributeName": "custom.sap.hana.calscript.v7.calcViewType",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcView",
+      "attributeName": "custom.sap.hana.calscript.v7.defaultClient",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcViewField",
+      "attributeName": "custom.sap.hana.calscript.v7.keyAttribute",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcViewField",
+      "attributeName": "custom.sap.hana.calscript.v7.columnExpression",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaCalcViewField",
+      "attributeName": "custom.sap.hana.calscript.v7.columnDataType",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaScriptBlock",
+      "attributeName": "custom.sap.hana.calscript.v7.scriptType",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaScriptBlock",
+      "attributeName": "custom.sap.hana.calscript.v7.transformationLogic",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaScriptBlock",
+      "attributeName": "custom.sap.hana.calscript.v7.joinType",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    },
+    {
+      "className": "custom.sap.hana.calscript.v7.HanaScriptBlock",
+      "attributeName": "custom.sap.hana.calscript.v7.filterCondition",
+      "isRequired": false,
+      "isCuratable": false,
+      "deprecated": false,
+      "followers": [],
+      "isHidden": false,
+      "cdc": true,
+      "custom": false,
+      "gatherStats": false,
+      "materialized": false,
+      "conditions": [],
+      "deleted": false
+    }
+  ],
+  "dataTypes": [],
+  "associationKinds": [],
+  "associationAttributes": [],
+  "references": [],
+  "associationKindAttributes": [],
+  "classUserKeys": [],
+  "classPartitionKeys": [],
+  "associationPartitionKeys": [],
+  "namespaces": [],
+  "packageNamespaces": [
+    "default"
+  ],
+  "identity": "",
+  "version": 1,
+  "modifiedBy": ""
+}

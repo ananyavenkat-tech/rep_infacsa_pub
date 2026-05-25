@@ -1,0 +1,161 @@
+core.externalId,core.name,core.assignable,custom.sap.hana.calscript.v7.scriptType,custom.sap.hana.calscript.v7.transformationLogic
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_AR_AGING/open_items,open_items,True,SCRIPT_BASED,"SELECT
+      BSID.BUKRS,
+      BSID.KUNNR,
+      BSID.BELNR,
+      BSID.BUDAT,
+      BSID.FAEDT,
+      BSID.WAERS,
+      BSID.DMBTR,
+      BSID.WRBTR,
+      DAYS_BETWEEN(BSID.FAEDT, CURRENT_DATE) AS DAYS_OVERDUE
+    FROM ""SLT_PRD_FI"".""BSID"" AS BSID
+    WHERE BSID.BUKRS IS NOT NULL
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_AR_AGING/enriched,enriched,True,SCRIPT_BASED,"SELECT
+      oi.BUKRS,
+      oi.KUNNR,
+      oi.BELNR,
+      oi.BUDAT,
+      oi.FAEDT,
+      oi.WAERS,
+      oi.DMBTR,
+      oi.WRBTR,
+      oi.DAYS_OVERDUE,
+      KNA1.NAME1 AS CUSTOMER_NAME,
+      CASE
+        WHEN oi.DAYS_OVERDUE <= 0  THEN 'Current'
+        WHEN oi.DAYS_OVERDUE <= 30 THEN '1-30 Days'
+        WHEN oi.DAYS_OVERDUE <= 60 THEN '31-60 Days'
+        WHEN oi.DAYS_OVERDUE <= 90 THEN '61-90 Days'
+        ELSE 'Over 90 Days'
+      END AS AGING_BUCKET
+    FROM open_items AS oi
+    LEFT JOIN ""SLT_PRD_FI"".""KNA1"" AS KNA1
+      ON oi.KUNNR = KNA1.KUNNR
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_INVENTORY_STOCK/stock_base,stock_base,True,SCRIPT_BASED,"SELECT
+      MARD.WERKS,
+      MARD.LGORT,
+      MARD.MATNR,
+      MARD.LABST,
+      MARD.EINME
+    FROM ""SLT_PRD_MM"".""MARD"" AS MARD
+    WHERE MARD.LABST > 0 OR MARD.EINME > 0
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_INVENTORY_STOCK/material_info,material_info,True,SCRIPT_BASED,"SELECT
+      sb.WERKS,
+      sb.LGORT,
+      sb.MATNR,
+      sb.LABST,
+      sb.EINME,
+      MARA.MEINS,
+      MARA.MTYPE,
+      MAKT.MAKTX,
+      T001W.NAME1 AS PLANT_NAME,
+      MBEW.STPRS * sb.LABST AS STOCK_VALUE,
+      CASE
+        WHEN sb.LABST = 0 THEN 'Out of Stock'
+        WHEN sb.LABST < 10 THEN 'Low Stock'
+        ELSE 'In Stock'
+      END AS STOCK_STATUS
+    FROM stock_base AS sb
+    LEFT JOIN ""SLT_PRD_MM"".""MARA"" AS MARA ON sb.MATNR = MARA.MATNR
+    LEFT JOIN ""SLT_PRD_MM"".""MAKT"" AS MAKT ON sb.MATNR = MAKT.MATNR
+    LEFT JOIN ""SLT_PRD_MM"".""T001W"" AS T001W ON sb.WERKS = T001W.WERKS
+    LEFT JOIN ""SLT_PRD_MM"".""MBEW"" AS MBEW ON sb.MATNR = MBEW.MATNR AND sb.WERKS = MBEW.BWKEY
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_SALES_ORDERS/order_header,order_header,True,SCRIPT_BASED,"SELECT
+      VBAK.VBELN,
+      VBAK.ERDAT,
+      VBAK.AUART,
+      VBAK.KUNNR,
+      VBAK.WAERK,
+      VBAK.VKORG,
+      VBAK.GBSTK
+    FROM ""SLT_PRD_SD"".""VBAK"" AS VBAK
+    WHERE VBAK.ERDAT >= ADD_YEARS(CURRENT_DATE, -2)
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_SALES_ORDERS/order_items,order_items,True,SCRIPT_BASED,"SELECT
+      oh.VBELN,
+      oh.ERDAT,
+      oh.AUART,
+      oh.KUNNR,
+      oh.WAERK,
+      oh.VKORG,
+      oh.GBSTK,
+      VBAP.MATNR,
+      VBAP.ARKTX,
+      VBAP.KWMENG,
+      VBAP.NETWR,
+      VBAP.MWSBP
+    FROM order_header AS oh
+    INNER JOIN ""SLT_PRD_SD"".""VBAP"" AS VBAP ON oh.VBELN = VBAP.VBELN
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/CV_SALES_ORDERS/enriched,enriched,True,SCRIPT_BASED,"SELECT
+      oi.VBELN,
+      oi.ERDAT,
+      oi.AUART,
+      oi.KUNNR,
+      KNA1.NAME1 AS CUSTOMER_NAME,
+      oi.MATNR,
+      oi.ARKTX,
+      oi.WAERK,
+      oi.VKORG,
+      oi.KWMENG,
+      oi.NETWR,
+      oi.MWSBP,
+      CASE oi.GBSTK
+        WHEN 'A' THEN 'Open'
+        WHEN 'B' THEN 'Partially Processed'
+        WHEN 'C' THEN 'Completed'
+        ELSE 'Unknown'
+      END AS ORDER_STATUS
+    FROM order_items AS oi
+    LEFT JOIN ""SLT_PRD_SD"".""KNA1"" AS KNA1 ON oi.KUNNR = KNA1.KUNNR
+  )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/TI_VENDOR_5Y/BS,BS,True,SCRIPT_BASED,"SELECT 
+    BELNR,                     
+    BUKRS,                    
+    GJAHR,                
+    MAX(CASE WHEN BUZEI  LIKE '%1' THEN ZUONR END) AS ZUONR,  
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN LIFNR END) AS LIFNR  ,
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN KUNNR END) AS KUNNR,
+    MAX(CASE WHEN BUZEI NOT LIKE '%1' THEN SGTXT END) AS SGTXT
+FROM ""SLT_PRD_BAP"".""BSEG""
+WHERE  GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+ --GJAHR = 2022                      
+GROUP BY BELNR, BUKRS, GJAHR    )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/TI_VENDOR_5Y/cte2,cte2,True,SCRIPT_BASED,"SELECT DISTINCT
+RBUKRS, RBUSA, RYEAR,  DOCNR, RACCT, POPER, f.BUDAT, BS.LIFNR, BS.KUNNR,
+RTCUR, RWCUR, WSL, TSL, HSL, BS.ZUONR, febcl.selvon as payment_order,
+ BS.SGTXT, EXTRACT_DAY(f.BUDAT) AS ""DAY"",  
+WEEKDAY(f.BUDAT) AS ""WEEKDAY"", DAYNAME (f.BUDAT) AS ""DAYNAME"", 
+CEIL(DAYOFMONTH(f.BUDAT) / 6.0) AS SixDayGroup,     
+CEIL((DAYOFMONTH(f.BUDAT) + WEEKDAY(TO_DATE(YEAR(f.BUDAT) || '-' || MONTH(f.BUDAT) || '-01', 'YYYY-MM-DD'))) / 7.0) AS WeekOfMonth,
+DC.FULLNAME AS Customer_Name, DV.FULLNAME AS Vendor_Name
+FROM ""SLT_PRD_BAP"".""FAGLFLEXA"" AS F
+INNER JOIN BS
+ON F.RYEAR = BS.GJAHR AND F.DOCNR = BS.BELNR AND F.RBUKRS = BS.BUKRS 
+INNER JOIN ""SLT_PRD_BAP"".""T012K"" AS T
+ ON  T.hkont = F.RACCT
+ INNER JOIN ""SLT_PRD_BAP"".""BSEG"" AS BSEG
+ON F.RYEAR = BSEG.GJAHR AND F.DOCNR = BSEG.BELNR AND F.RBUKRS = BSEG.BUKRS AND BSEG.BUZEI LIKE '%1' and  BSEG.GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+LEFT JOIN ""SLT_PRD_BAP"".""BKPF"" AS BKPF ON BKPF.BELNR = BSEG.BELNR AND BKPF.BUKRS = BSEG.BUKRS AND BKPF.GJAHR = BSEG.GJAHR AND BKPF.GJAHR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5)
+LEFT JOIN ""SLT_PRD_BAP"".""FEBCL"" AS FEBCL ON left(""BKPF"".""BKTXT"", 8) = febcl.kukey and RIGHT(BKPF.""BKTXT"", 5) = FEBCL.ESNUM
+LEFT JOIN ""_SYS_BIC"".""sc-dm-dev.Time_Intelligence/DIM_VEND"" AS DV ON BS.LIFNR = DV.LIFNR
+LEFT JOIN ""_SYS_BIC"".""sc-dm-dev.Time_Intelligence/DIM_CUST"" AS DC ON BS.KUNNR = DC.KUNNR
+WHERE RYEAR >= ADD_YEARS(TO_DATE(YEAR(CURRENT_DATE) || '-01-01', 'YYYY-MM-DD'), -5) )"
+custom.sap.hana.calscript.v7.HanaScriptBlock/TI_VENDOR_5Y/cte3,cte3,True,SCRIPT_BASED,"SELECT 
+      RBUKRS, RBUSA, RYEAR,  DOCNR, RACCT, POPER, BUDAT, LIFNR, KUNNR,
+      RTCUR, RWCUR, WSL, TSL, HSL, ZUONR, payment_order, SGTXT, ""DAY"", 
+      ""WEEKDAY"", ""DAYNAME"", SixDayGroup, WeekOfMonth, Customer_Name, Vendor_Name,
+      CASE
+	    WHEN nullif(trim(payment_order), '') IS NOT NULL AND nullif(trim(LIFNR), '') IS NOT NULL AND NULLIF(trim(KUNNR), '') IS NULL 
+	    AND HSL > 0 AND TSL > 0 AND WSL > 0 THEN 'refund'
+	    WHEN nullif(trim(payment_order), '') IS NOT NULL AND nullif(trim(LIFNR), '') IS NOT NULL AND NULLIF(trim(KUNNR), '') IS NULL THEN 'payment'
+	    WHEN nullif(trim(payment_order), '') IS NULL AND nullif(trim(LIFNR), '') IS NULL AND NULLIF(trim(KUNNR), '') IS NOT NULL THEN 'receipt'
+	    WHEN nullif(trim(payment_order), '') IS NULL AND nullif(trim(LIFNR), '') IS NULL AND NULLIF(trim(KUNNR), '') IS NULL THEN 'other'
+	    ELSE 'unknown'
+	  END AS transaction_type
+FROM cte2)"
