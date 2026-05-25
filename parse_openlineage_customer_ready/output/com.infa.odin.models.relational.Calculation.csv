@@ -1,0 +1,6 @@
+core.externalId,core.Reference,core.assignable,core.name
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor/SQL_JOB/confidence,,TRUE,confidence
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor/SQL_JOB/hash_field,,TRUE,hash_field
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor/SQL_JOB/sampledatetime,,TRUE,sampledatetime
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor/SQL_JOB/tagName,,TRUE,tagName
+gethaortagsraw/socar_lakehouse/gethaortagsraw.append_data.lakehouse_lh_dwst_stg_tag_values_haor/SQL_JOB/value,,TRUE,value

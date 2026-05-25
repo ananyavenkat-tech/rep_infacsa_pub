@@ -1,0 +1,12 @@
+metadata:
+  sources:
+    - table: target_data
+      columns:
+        - cust_id
+        - first_name
+        - last_name
+        - email
+        - sex
+        - state
+        - age
+        - postcode

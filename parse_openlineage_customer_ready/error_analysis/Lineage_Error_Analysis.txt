@@ -1,0 +1,128 @@
+================================================================================
+OPENLINEAGE ERROR ANALYSIS REPORT
+================================================================================
+Generated: 2026-05-19 17:05:42
+
+SUMMARY BY FILE
+--------------------------------------------------------------------------------
+
+File: 00b3fc34-1d8f-4a8c-b194-023a1140d5bc.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+File: 00d24770-8146-4947-bf1e-95d21b0f6893.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+File: 00d42d01-a4cd-42dd-8ae9-137eb79fdfe4.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+File: 00d65373-d73f-4798-a57a-0f452d64ff0e.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+File: 00f1ab62-78d4-44e5-9356-bab178a47cd1.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+File: 0a0c5da3-644a-4d82-9a91-a054eaf25e5b.ndjson
+  Total valid events: 100
+  Invalid JSON lines: 0
+  Events with NO INPUTS: 0
+  Events with NO OUTPUTS: 0
+  Events with NO JOB INFO: 0
+  Events with NO SCHEMA: 0
+  Events with NO COLUMN LINEAGE: 0
+  Events ready for lineage: 0
+
+================================================================================
+REASONS WHY FILES CANNOT GENERATE LINEAGE
+================================================================================
+
+1. NO INPUTS
+   Why it prevents lineage:
+   - DataSetDataFlow requires source datasets (inputs)
+   - Without inputs, the lineage origin cannot be established
+   - No parent datasets can be linked to output datasets
+
+2. NO OUTPUTS
+   Why it prevents lineage:
+   - DataSetDataFlow requires target datasets (outputs)
+   - Without outputs, the lineage destination cannot be established
+   - Cannot complete the flow from inputs to results
+
+3. NO JOB INFORMATION
+   Why it prevents lineage:
+   - Tasks (jobs) are the intermediate nodes connecting datasets
+   - Without job name/namespace, cannot create Task metadata
+   - Links between datasets and processing steps cannot be formed
+
+4. NO SCHEMA FACET
+   Why it prevents column-level lineage:
+   - DataElement (columns) require schema information
+   - Without schema, cannot identify which columns exist in each dataset
+   - Column-level lineage and transformations cannot be mapped
+
+5. NO COLUMN LINEAGE FACET
+   Why it prevents directional lineage:
+   - DirectionalDataFlow requires columnLineage facet
+   - Without columnLineage, cannot trace how input columns map to output columns
+   - Field-level transformations cannot be visualized
+   - Only table-level (dataset) lineage can be generated, not column-level
+
+6. INVALID JSON
+   Why it prevents lineage:
+   - Malformed JSON cannot be parsed
+   - Event structure is invalid or corrupted
+   - Line is skipped entirely from processing
+
+
+================================================================================
+LINEAGE TYPES AND REQUIREMENTS
+================================================================================
+
+TABLE-LEVEL LINEAGE (DataSetDataFlow)
+  Minimum requirements:
+    ✓ At least one input dataset
+    ✓ At least one output dataset
+    ✓ Job/task information (job.name)
+  Generates: core.DataSetDataFlow links
+
+COLUMN-LEVEL LINEAGE (DirectionalDataFlow)
+  Minimum requirements:
+    ✓ All of the above (for table-level)
+    ✓ Schema facet with field definitions (inputs and outputs)
+    ✓ columnLineage facet in job facets
+  Generates: DirectionalDataFlow links (input DataElement → Calculation → output DataElement)
+

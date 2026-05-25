@@ -1,0 +1,7 @@
+filename,total_events,valid_events,invalid_json,events_with_no_inputs,events_with_no_outputs,events_with_no_job,events_with_no_schema,events_with_no_column_lineage,lineage_ready_events,can_generate_directional_lineage_percent,can_generate_dataset_dataflow_percent
+00b3fc34-1d8f-4a8c-b194-023a1140d5bc.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
+00d24770-8146-4947-bf1e-95d21b0f6893.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
+00d42d01-a4cd-42dd-8ae9-137eb79fdfe4.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
+00d65373-d73f-4798-a57a-0f452d64ff0e.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
+00f1ab62-78d4-44e5-9356-bab178a47cd1.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
+0a0c5da3-644a-4d82-9a91-a054eaf25e5b.ndjson,100,100,0,0,0,0,0,0,0,100.0%,100.0%
