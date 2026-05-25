@@ -1,0 +1,9 @@
+core.externalId,core.reference,core.assignable,core.name
+Sample_Sales_Report_78752638/sales_vw,TRUE,TRUE,sales_vw
+Sample_Sales_Report_78752638/customer_vw,TRUE,TRUE,customer_vw
+Simpfy_project_96010eb4/simpfy_projects_vw,TRUE,TRUE,simpfy_projects_vw
+Simpfy_project_96010eb4/LastMilestonesTable,TRUE,TRUE,LastMilestonesTable
+Simpfy_project_96010eb4/Stage_sort,TRUE,TRUE,Stage_sort
+Simpfy_project_96010eb4/simpfy_challenges_vw,TRUE,TRUE,simpfy_challenges_vw
+Simpfy_project_96010eb4/Unique_Projects,TRUE,TRUE,Unique_Projects
+Simpfy_project_96010eb4/simpfy_kpi_value,TRUE,TRUE,simpfy_kpi_value
