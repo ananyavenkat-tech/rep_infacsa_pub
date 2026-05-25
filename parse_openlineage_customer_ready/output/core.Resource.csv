@@ -1,0 +1,4 @@
+core.externalId,core.Reference,core.assignable,core.name
+s3___lakehouse,TRUE,,s3___lakehouse
+s3___lh_downstream,TRUE,,s3___lh_downstream
+s3a___ret_30,TRUE,,s3a___ret_30
