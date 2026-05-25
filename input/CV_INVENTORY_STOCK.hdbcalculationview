@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="CV_INVENTORY_STOCK" applyPrivilegeType="ANALYTIC_PRIVILEGE" cacheEnabled="true" cacheInvalidationPeriod="DAILY" checkAnalyticPrivileges="true" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" translationRelevant="true" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" runWithInvokerPrivileges="true" scriptParametersCaseSensitive="true">
+  <origin/>
+  <descriptions defaultDescription="Inventory Stock Overview"/>
+  <metadata changedAt="2026-02-10 11:00:00.000"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources/>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute datatype="NVARCHAR" id="WERKS" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="LGORT" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="MATNR" length="18"/>
+        <viewAttribute datatype="NVARCHAR" id="MAKTX" length="40"/>
+        <viewAttribute datatype="NVARCHAR" id="MTYPE" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="MEINS" length="3"/>
+        <viewAttribute datatype="NVARCHAR" id="PLANT_NAME" length="30"/>
+        <viewAttribute datatype="NVARCHAR" id="STOCK_STATUS" length="20"/>
+        <viewAttribute datatype="DECIMAL" id="LABST" length="23" scale="3"/>
+        <viewAttribute datatype="DECIMAL" id="EINME" length="23" scale="3"/>
+        <viewAttribute datatype="DECIMAL" id="STOCK_VALUE" length="23" scale="2"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <definition>
+/********* Begin Procedure Script ************/
+BEGIN
+  var_out =
+  WITH stock_base AS (
+    SELECT
+      MARD.WERKS,
+      MARD.LGORT,
+      MARD.MATNR,
+      MARD.LABST,
+      MARD.EINME
+    FROM &quot;SLT_PRD_MM&quot;.&quot;MARD&quot; AS MARD
+    WHERE MARD.LABST > 0 OR MARD.EINME > 0
+  ),
+  material_info AS (
+    SELECT
+      sb.WERKS,
+      sb.LGORT,
+      sb.MATNR,
+      sb.LABST,
+      sb.EINME,
+      MARA.MEINS,
+      MARA.MTYPE,
+      MAKT.MAKTX,
+      T001W.NAME1 AS PLANT_NAME,
+      MBEW.STPRS * sb.LABST AS STOCK_VALUE,
+      CASE
+        WHEN sb.LABST = 0 THEN 'Out of Stock'
+        WHEN sb.LABST &lt; 10 THEN 'Low Stock'
+        ELSE 'In Stock'
+      END AS STOCK_STATUS
+    FROM stock_base AS sb
+    LEFT JOIN &quot;SLT_PRD_MM&quot;.&quot;MARA&quot; AS MARA ON sb.MATNR = MARA.MATNR
+    LEFT JOIN &quot;SLT_PRD_MM&quot;.&quot;MAKT&quot; AS MAKT ON sb.MATNR = MAKT.MATNR
+    LEFT JOIN &quot;SLT_PRD_MM&quot;.&quot;T001W&quot; AS T001W ON sb.WERKS = T001W.WERKS
+    LEFT JOIN &quot;SLT_PRD_MM&quot;.&quot;MBEW&quot; AS MBEW ON sb.MATNR = MBEW.MATNR AND sb.WERKS = MBEW.BWKEY
+  )
+  SELECT * FROM material_info;
+END /********* End Procedure Script ************/
+      </definition>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Script_View">
+    <descriptions/>
+    <attributes>
+      <attribute id="WERKS" order="1"><descriptions defaultDescription="Plant"/><keyMapping columnObjectName="Script_View" columnName="WERKS"/></attribute>
+      <attribute id="LGORT" order="2"><descriptions defaultDescription="Storage Location"/><keyMapping columnObjectName="Script_View" columnName="LGORT"/></attribute>
+      <attribute id="MATNR" order="3"><descriptions defaultDescription="Material Number"/><keyMapping columnObjectName="Script_View" columnName="MATNR"/></attribute>
+      <attribute id="MAKTX" order="4"><descriptions defaultDescription="Material Description"/><keyMapping columnObjectName="Script_View" columnName="MAKTX"/></attribute>
+      <attribute id="MTYPE" order="5"><descriptions defaultDescription="Material Type"/><keyMapping columnObjectName="Script_View" columnName="MTYPE"/></attribute>
+      <attribute id="MEINS" order="6"><descriptions defaultDescription="Base Unit of Measure"/><keyMapping columnObjectName="Script_View" columnName="MEINS"/></attribute>
+      <attribute id="PLANT_NAME" order="7"><descriptions defaultDescription="Plant Name"/><keyMapping columnObjectName="Script_View" columnName="PLANT_NAME"/></attribute>
+      <attribute id="STOCK_STATUS" order="8"><descriptions defaultDescription="Stock Status"/><keyMapping columnObjectName="Script_View" columnName="STOCK_STATUS"/></attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation><tableProxies/><joins/><layout><shapes/></layout></privateDataFoundation>
+    <baseMeasures>
+      <measure id="LABST" order="9" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Unrestricted Stock"/><measureMapping columnObjectName="Script_View" columnName="LABST"/></measure>
+      <measure id="EINME" order="10" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Total Stock"/><measureMapping columnObjectName="Script_View" columnName="EINME"/></measure>
+      <measure id="STOCK_VALUE" order="11" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Stock Value"/><measureMapping columnObjectName="Script_View" columnName="STOCK_VALUE"/></measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout><shapes><shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup"><upperLeftCorner x="40" y="85"/></shape></shapes></layout>
+</Calculation:scenario>

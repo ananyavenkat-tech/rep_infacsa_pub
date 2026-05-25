@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="CV_AR_AGING" applyPrivilegeType="ANALYTIC_PRIVILEGE" cacheEnabled="true" cacheInvalidationPeriod="DAILY" checkAnalyticPrivileges="true" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" translationRelevant="true" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" runWithInvokerPrivileges="true" scriptParametersCaseSensitive="true">
+  <origin/>
+  <descriptions defaultDescription="Accounts Receivable Aging Report"/>
+  <metadata changedAt="2026-01-15 09:30:00.000"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources/>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute datatype="NVARCHAR" id="BUKRS" length="4"/>
+        <viewAttribute datatype="NVARCHAR" id="KUNNR" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="BELNR" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="BUDAT" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="FAEDT" length="10"/>
+        <viewAttribute datatype="NVARCHAR" id="WAERS" length="5"/>
+        <viewAttribute datatype="DECIMAL" id="DMBTR" length="23" scale="2"/>
+        <viewAttribute datatype="DECIMAL" id="WRBTR" length="23" scale="2"/>
+        <viewAttribute datatype="NVARCHAR" id="CUSTOMER_NAME" length="100"/>
+        <viewAttribute datatype="NVARCHAR" id="AGING_BUCKET" length="20"/>
+        <viewAttribute datatype="INTEGER" id="DAYS_OVERDUE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <definition>
+/********* Begin Procedure Script ************/
+BEGIN
+  var_out =
+  WITH open_items AS (
+    SELECT
+      BSID.BUKRS,
+      BSID.KUNNR,
+      BSID.BELNR,
+      BSID.BUDAT,
+      BSID.FAEDT,
+      BSID.WAERS,
+      BSID.DMBTR,
+      BSID.WRBTR,
+      DAYS_BETWEEN(BSID.FAEDT, CURRENT_DATE) AS DAYS_OVERDUE
+    FROM &quot;SLT_PRD_FI&quot;.&quot;BSID&quot; AS BSID
+    WHERE BSID.BUKRS IS NOT NULL
+  ),
+  enriched AS (
+    SELECT
+      oi.BUKRS,
+      oi.KUNNR,
+      oi.BELNR,
+      oi.BUDAT,
+      oi.FAEDT,
+      oi.WAERS,
+      oi.DMBTR,
+      oi.WRBTR,
+      oi.DAYS_OVERDUE,
+      KNA1.NAME1 AS CUSTOMER_NAME,
+      CASE
+        WHEN oi.DAYS_OVERDUE &lt;= 0  THEN 'Current'
+        WHEN oi.DAYS_OVERDUE &lt;= 30 THEN '1-30 Days'
+        WHEN oi.DAYS_OVERDUE &lt;= 60 THEN '31-60 Days'
+        WHEN oi.DAYS_OVERDUE &lt;= 90 THEN '61-90 Days'
+        ELSE 'Over 90 Days'
+      END AS AGING_BUCKET
+    FROM open_items AS oi
+    LEFT JOIN &quot;SLT_PRD_FI&quot;.&quot;KNA1&quot; AS KNA1
+      ON oi.KUNNR = KNA1.KUNNR
+  )
+  SELECT * FROM enriched;
+END /********* End Procedure Script ************/
+      </definition>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Script_View">
+    <descriptions/>
+    <attributes>
+      <attribute id="BUKRS" order="1"><descriptions defaultDescription="Company Code"/><keyMapping columnObjectName="Script_View" columnName="BUKRS"/></attribute>
+      <attribute id="KUNNR" order="2"><descriptions defaultDescription="Customer Number"/><keyMapping columnObjectName="Script_View" columnName="KUNNR"/></attribute>
+      <attribute id="BELNR" order="3"><descriptions defaultDescription="Document Number"/><keyMapping columnObjectName="Script_View" columnName="BELNR"/></attribute>
+      <attribute id="BUDAT" order="4"><descriptions defaultDescription="Posting Date"/><keyMapping columnObjectName="Script_View" columnName="BUDAT"/></attribute>
+      <attribute id="FAEDT" order="5"><descriptions defaultDescription="Due Date"/><keyMapping columnObjectName="Script_View" columnName="FAEDT"/></attribute>
+      <attribute id="WAERS" order="6"><descriptions defaultDescription="Currency"/><keyMapping columnObjectName="Script_View" columnName="WAERS"/></attribute>
+      <attribute id="CUSTOMER_NAME" order="9"><descriptions defaultDescription="Customer Name"/><keyMapping columnObjectName="Script_View" columnName="CUSTOMER_NAME"/></attribute>
+      <attribute id="AGING_BUCKET" order="10"><descriptions defaultDescription="Aging Bucket"/><keyMapping columnObjectName="Script_View" columnName="AGING_BUCKET"/></attribute>
+      <attribute id="DAYS_OVERDUE" order="11"><descriptions defaultDescription="Days Overdue"/><keyMapping columnObjectName="Script_View" columnName="DAYS_OVERDUE"/></attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation><tableProxies/><joins/><layout><shapes/></layout></privateDataFoundation>
+    <baseMeasures>
+      <measure id="DMBTR" order="7" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Amount in Local Currency"/><measureMapping columnObjectName="Script_View" columnName="DMBTR"/></measure>
+      <measure id="WRBTR" order="8" aggregationType="sum" measureType="simple"><descriptions defaultDescription="Amount in Document Currency"/><measureMapping columnObjectName="Script_View" columnName="WRBTR"/></measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout><shapes><shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup"><upperLeftCorner x="40" y="85"/></shape></shapes></layout>
+</Calculation:scenario>

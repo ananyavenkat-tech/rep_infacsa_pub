@@ -1,0 +1,5 @@
+core.externalId,core.name,core.description,core.assignable,custom.sap.hana.calscript.v7.packagePath,custom.sap.hana.calscript.v7.calcViewType,custom.sap.hana.calscript.v7.defaultClient
+custom.sap.hana.calscript.v7.HanaCalcView/CV_AR_AGING,CV_AR_AGING,Accounts Receivable Aging Report,True,,CUBE,$$client$$
+custom.sap.hana.calscript.v7.HanaCalcView/CV_INVENTORY_STOCK,CV_INVENTORY_STOCK,Inventory Stock Overview,True,,CUBE,$$client$$
+custom.sap.hana.calscript.v7.HanaCalcView/CV_SALES_ORDERS,CV_SALES_ORDERS,Sales Order Summary,True,,CUBE,$$client$$
+custom.sap.hana.calscript.v7.HanaCalcView/TI_VENDOR_5Y,TI_VENDOR_5Y,TIME_INTELLIGENCE_VENDOR_5Y,True,,CUBE,$$client$$

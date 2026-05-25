@@ -1,0 +1,6 @@
+core.externalId,core.name,core.reference,core.assignable
+REF_HANA_SLT_PRD_FI_CONN,SLT_PRD_FI_Connection,True,True
+REF_HANA_SLT_PRD_MM_CONN,SLT_PRD_MM_Connection,True,True
+REF_HANA_SLT_PRD_SD_CONN,SLT_PRD_SD_Connection,True,True
+REF_HANA_SLT_PRD_BAP_CONN,SLT_PRD_BAP_Connection,True,True
+REF_HANA__SYS_BIC_CONN,_SYS_BIC_Connection,True,True

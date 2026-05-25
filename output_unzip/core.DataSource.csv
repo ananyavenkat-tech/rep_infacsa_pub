@@ -1,0 +1,7 @@
+core.externalId,core.Reference,core.assignable,core.name
+hana_calcviews_container,False,True,HANA Calculation Views
+REF_HANA_SLT_PRD_FI_DS,True,True,SLT_PRD_FI
+REF_HANA_SLT_PRD_MM_DS,True,True,SLT_PRD_MM
+REF_HANA_SLT_PRD_SD_DS,True,True,SLT_PRD_SD
+REF_HANA_SLT_PRD_BAP_DS,True,True,SLT_PRD_BAP
+REF_HANA__SYS_BIC_DS,True,True,_SYS_BIC
